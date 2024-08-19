@@ -1,0 +1,22 @@
+services:
+  myapp:
+        build: .
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v2.39.1
+    volumes:
+      - ./script/prometheus.yaml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    command: --config.file=/etc/prometheus/prometheus.yml --log.level=debug
+    depends_on:
+      - myapp
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:9.1.7
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./script/grafana_prometheus_ds.yml:/etc/grafana/provisioning/datasources/prometheus_ds.yml
+    depends_on:
+      - prometheus
